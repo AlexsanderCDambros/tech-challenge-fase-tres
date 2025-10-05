@@ -2,14 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tech_challenge_fase_tres/routes.dart';
 
-class RegisterScrenn extends StatefulWidget {
-  const RegisterScrenn({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<RegisterScrenn> createState() => _RegisterScrennState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _RegisterScrennState extends State<RegisterScrenn> {
+class _LoginScreenState extends State<LoginScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -20,7 +20,7 @@ class _RegisterScrennState extends State<RegisterScrenn> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Cadastrar usuário'),
+        title: Text('Entrar na aplicação'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -35,30 +35,37 @@ class _RegisterScrennState extends State<RegisterScrenn> {
               decoration: const InputDecoration(labelText: 'Senha'),
               obscureText: true,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             Text(
               _errorMessage,
               style: const TextStyle(color: Colors.red),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _registrar,
-              child: const Text('Registrar'),
+              onPressed: _entrar,
+              child: const Text('Entrar'),
             ),
-          ],
+            const SizedBox(height: 16),
+            TextButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/registro');
+              }, 
+              child: Text('Criar uma conta')
+            )
+         ],
         ),
-      ),
+      )
     );
   }
 
-  _registrar() async{
+  _entrar() async {
     try {
-      await _auth.createUserWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, Routes.login);
+      Navigator.pushReplacementNamed(context, Routes.inicio);
     } on FirebaseAuthException catch (e) {
       setState(() {
         _errorMessage = e.message!;

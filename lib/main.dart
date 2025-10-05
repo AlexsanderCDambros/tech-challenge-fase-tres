@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:tech_challenge_fase_tres/login_screen.dart';
 import 'package:tech_challenge_fase_tres/register_screen.dart';
 
 import 'inicio.dart';
@@ -20,8 +21,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Tech Challenge 3',
       theme: ThemeData(primarySwatch: Colors.blue),
-      initialRoute: Routes.registro,
+      initialRoute: Routes.login,
       routes: {
+        Routes.login: (context) => LoginScreen(),
         Routes.registro: (context) => RegisterScrenn(),
         Routes.inicio: (context) => InicioPage(),
         Routes.transacoes: (context) => TransacoesPage(),
