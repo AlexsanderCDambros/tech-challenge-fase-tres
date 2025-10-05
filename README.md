@@ -23,13 +23,24 @@ Comando para clonar o repositório:
     
 `git clone https://github.com/AlexsanderCDambros/tech-challenge-fase-tres.git`
 
+### 2. Configure uma aplicação no Firebase
+    
+2.1 Acesse o console do firebase 
 
-### 2. Instalação das dependências 
+2.2 Crie um novo projeto no firebase
+
+2.3 Habilite o storage no firebase
+
+2.4 Vá nas configurações do projeto firebase e vincule a aplicação com o projeto firebase, você vai precisar do noem do pacote que pode encontrar no projeto baixado em: android/app/build.grandle.kts na propriedade android.namespace
+
+2.5 Você terá que baixar o arquivo que o firebase irá gerar e colar ele no projeto baixado em: android/app e fazer as demais instruções que terão no passo a passo de configuração do firebase.
+
+### 3. Instalação das dependências 
 
 Depois de ter os arquivos em sua máquina, instale as extensões do dart e do flutter no seu VSCode e as depensências serão baixadas automaticamente.
 
 
-### 3. Rodar o projeto em desenvolvimento
+### 4. Rodar o projeto em desenvolvimento
 
 Quando o processo de instalação das dependências terminar, basta clicar na aba Run and Debug do VSCode e clicar no botão Run e Debug. 
 A aplicação deve iniciar no device que você selecionar no canto inferior direito do VSCode.
