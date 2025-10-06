@@ -29,11 +29,38 @@ Comando para clonar o repositório:
 
 2.2 Crie um novo projeto no firebase
 
-2.3 Habilite o storage no firebase
+2.3 Habilite o Storage no firebase, seguindo o passo a passo do console. Depois de criado, adicione a seguinte regra:
 
-2.4 Vá nas configurações do projeto firebase e vincule a aplicação com o projeto firebase, você vai precisar do noem do pacote que pode encontrar no projeto baixado em: android/app/build.grandle.kts na propriedade android.namespace
+```
+    rules_version = '2';
+    service firebase.storage {
+        match /b/{bucket}/o {
+            match /receipts/{userId}/{allPaths=**} {
+            allow read, write: if request.auth != null && request.auth.uid == userId;
+            }
+        }
+    }
+```
 
-2.5 Você terá que baixar o arquivo que o firebase irá gerar e colar ele no projeto baixado em: android/app e fazer as demais instruções que terão no passo a passo de configuração do firebase.
+2.4 Habilite o Firestore Database no firebase, seguindo o passo a passo do console.
+
+```
+    rules_version = '2';
+    service cloud.firestore {
+        match /databases/{database}/documents {
+            match /transactions/{userId}/{document} {
+            allow read, write: if request.auth != null && request.auth.uid == userId;
+            }
+            match /categories/{userId}/{document} {
+            allow read, write: if request.auth != null && request.auth.uid == userId;
+            }
+        }
+    }
+```
+
+2.5 Vá nas configurações do projeto firebase e vincule a aplicação com o projeto firebase, você vai precisar do noem do pacote que pode encontrar no projeto baixado em: android/app/build.grandle.kts na propriedade android.namespace
+
+2.6 Você terá que baixar o arquivo que o firebase irá gerar e colar ele no projeto baixado em: android/app e fazer as demais instruções que terão no passo a passo de configuração do firebase.
 
 ### 3. Instalação das dependências 
 
