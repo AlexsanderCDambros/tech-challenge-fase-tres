@@ -34,20 +34,12 @@ class FirestoreService {
 
   // Buscar transações com filtros e paginação
   Stream<List<TransactionModel>> getTransactions({
-    String? category,
-    String? type,
     DateTime? startDate,
     DateTime? endDate,
     int limit = 20,
   }) {
     Query query = _transactionsRef.orderBy('date', descending: true).limit(limit);
-
-    if (category != null) {
-      query = query.where('category', isEqualTo: category);
-    }
-    if (type != null) {
-      query = query.where('type', isEqualTo: type);
-    }
+    
     if (startDate != null) {
       query = query.where('date', isGreaterThanOrEqualTo: startDate.millisecondsSinceEpoch);
     }
