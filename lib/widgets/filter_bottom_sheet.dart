@@ -2,13 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class FilterBottomSheet extends StatefulWidget {
-  final String? currentCategory;
-  final String? currentType;
   final DateTime? currentStartDate;
   final DateTime? currentEndDate;
   final Function({
-    String? category,
-    String? type,
     DateTime? startDate,
     DateTime? endDate,
   }) onApplyFilters;
@@ -16,8 +12,6 @@ class FilterBottomSheet extends StatefulWidget {
 
   const FilterBottomSheet({
     super.key,
-    this.currentCategory,
-    this.currentType,
     this.currentStartDate,
     this.currentEndDate,
     required this.onApplyFilters,
@@ -29,21 +23,12 @@ class FilterBottomSheet extends StatefulWidget {
 }
 
 class _FilterBottomSheetState extends State<FilterBottomSheet> {
-  String? _selectedCategory;
-  String? _selectedType;
   DateTime? _startDate;
   DateTime? _endDate;
-
-  final List<String> _categories = [
-    'Alimentação', 'Transporte', 'Moradia', 'Saúde', 'Lazer', 
-    'Salário', 'Investimentos', 'Freelance'
-  ];
 
   @override
   void initState() {
     super.initState();
-    _selectedCategory = widget.currentCategory;
-    _selectedType = widget.currentType;
     _startDate = widget.currentStartDate;
     _endDate = widget.currentEndDate;
   }
@@ -74,8 +59,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   void _applyFilters() {
     widget.onApplyFilters(
-      category: _selectedCategory,
-      type: _selectedType,
       startDate: _startDate,
       endDate: _endDate,
     );
@@ -84,8 +67,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
 
   void _clearFilters() {
     setState(() {
-      _selectedCategory = null;
-      _selectedType = null;
       _startDate = null;
       _endDate = null;
     });
@@ -94,9 +75,7 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
   }
 
   bool get _hasChanges {
-    return _selectedCategory != widget.currentCategory ||
-           _selectedType != widget.currentType ||
-           _startDate != widget.currentStartDate ||
+    return _startDate != widget.currentStartDate ||
            _endDate != widget.currentEndDate;
   }
 
@@ -112,60 +91,6 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
             'Filtrar Transações',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 16),
-          
-          // Tipo de Transação
-          const Text('Tipo:', style: TextStyle(fontWeight: FontWeight.bold)),
-          Row(
-            children: [
-              Expanded(
-                child: FilterChip(
-                  label: const Text('Todas'),
-                  selected: _selectedType == null,
-                  onSelected: (selected) {
-                    setState(() => _selectedType = null);
-                  },
-                ),
-              ),
-              Expanded(
-                child: FilterChip(
-                  label: const Text('Receitas'),
-                  selected: _selectedType == 'income',
-                  onSelected: (selected) {
-                    setState(() => _selectedType = 'income');
-                  },
-                ),
-              ),
-              Expanded(
-                child: FilterChip(
-                  label: const Text('Despesas'),
-                  selected: _selectedType == 'expense',
-                  onSelected: (selected) {
-                    setState(() => _selectedType = 'expense');
-                  },
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          
-          // Categoria
-          const Text('Categoria:', style: TextStyle(fontWeight: FontWeight.bold)),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _categories.map((category) {
-              return FilterChip(
-                label: Text(category),
-                selected: _selectedCategory == category,
-                onSelected: (selected) {
-                  setState(() {
-                    _selectedCategory = selected ? category : null;
-                  });
-                },
-              );
-            }).toList(),
           ),
           const SizedBox(height: 16),
           

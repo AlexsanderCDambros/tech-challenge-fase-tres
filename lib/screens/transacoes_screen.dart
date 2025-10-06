@@ -284,8 +284,6 @@ class _TransacoesScreenState extends State<TransacoesScreen> {
       context: context,
       isScrollControlled: true,
       builder: (context) => FilterBottomSheet(
-        currentCategory: _selectedCategory,
-        currentType: _selectedType,
         currentStartDate: _startDate,
         currentEndDate: _endDate,
         onApplyFilters: _applyFilters,
