@@ -179,8 +179,6 @@ class _TransacoesScreenState extends State<TransacoesScreen> {
           Expanded(
             child: StreamBuilder<List<TransactionModel>>(
               stream: _firestoreService.getTransactions(
-                category: _selectedCategory,
-                type: _selectedType,
                 startDate: _startDate,
                 endDate: _endDate,
                 limit: _limit,
