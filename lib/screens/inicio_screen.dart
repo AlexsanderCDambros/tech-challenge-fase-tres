@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:tech_challenge_fase_tres/screens/transacoes_screen.dart';
 import '../services/firestore_service.dart';
 import '../models/transaction_model.dart';
 
@@ -11,11 +12,14 @@ class InicioScreen extends StatefulWidget {
   State<InicioScreen> createState() => _InicioScreenState();
 }
 
-class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderStateMixin {
+class _InicioScreenState extends State<InicioScreen>
+    with SingleTickerProviderStateMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirestoreService _firestoreService = FirestoreService();
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
+
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -48,63 +52,115 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Dashboard Financeiro'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-      ),
-      body: StreamBuilder<List<TransactionModel>>(
-        stream: _firestoreService.getTransactions(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return _buildLoadingState();
-          }
-
-          if (snapshot.hasError) {
-            return Center(child: Text('Erro: ${snapshot.error}'));
-          }
-
-          final transactions = snapshot.data ?? [];
-          final chartData = _prepareChartData(transactions);
-          final summary = _calculateSummary(transactions);
-
-          return AnimatedBuilder(
-            animation: _fadeAnimation,
-            builder: (context, child) {
-              return Opacity(
-                opacity: _fadeAnimation.value,
-                child: Transform.translate(
-                  offset: Offset(0, (1 - _fadeAnimation.value) * 20),
-                  child: child,
-                ),
-              );
-            },
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Resumo Financeiro
-                  _buildFinancialSummary(summary),
-                  const SizedBox(height: 24),
-                  
-                  // Gráfico de Despesas por Categoria
-                  _buildCategoryChart(chartData['expense'] ?? []),
-                  const SizedBox(height: 24),
-                  
-                  // Gráfico de Barras - Receitas vs Despesas
-                  _buildBarChart(transactions),
-                  const SizedBox(height: 24),
-                  
-                  // Últimas Transações
-                  _buildRecentTransactions(transactions),
-                ],
-              ),
+        appBar: AppBar(
+          title: const Text('Dashboard Financeiro'),
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: _logout,
             ),
-          );
-        },
-      ),
+          ],
+        ),
+        body: _buildCurrentScreen(),
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: _onTabTapped,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.list),
+              label: 'Transações',
+            ),
+          ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/add-transaction');
+          },
+          child: const Icon(Icons.add),
+        ));
+  }
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  Widget _buildCurrentScreen() {
+    switch (_currentIndex) {
+      case 0:
+        return _buildDashboardContent();
+      case 1:
+        return const TransacoesScreen();
+      default:
+        return _buildDashboardContent();
+    }
+  }
+
+  Widget _buildDashboardContent() {
+    return StreamBuilder<List<TransactionModel>>(
+      stream: _firestoreService.getTransactions(),
+      builder: (context, snapshot) {
+        // ... mantém todo o conteúdo original do dashboard aqui
+        // (o mesmo código que já estava no build anterior)
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return _buildLoadingState();
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text('Erro: ${snapshot.error}'));
+        }
+
+        final transactions = snapshot.data ?? [];
+        final chartData = _prepareChartData(transactions);
+        final summary = _calculateSummary(transactions);
+
+        return AnimatedBuilder(
+          animation: _fadeAnimation,
+          builder: (context, child) {
+            return Opacity(
+              opacity: _fadeAnimation.value,
+              child: Transform.translate(
+                offset: Offset(0, (1 - _fadeAnimation.value) * 20),
+                child: child,
+              ),
+            );
+          },
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildFinancialSummary(summary),
+                const SizedBox(height: 24),
+                _buildCategoryChart(chartData['expense'] ?? []),
+                const SizedBox(height: 24),
+                _buildBarChart(transactions),
+                const SizedBox(height: 24),
+                _buildRecentTransactions(transactions),
+              ],
+            ),
+          ),
+        );
+      },
     );
+  }
+
+  Future<void> _logout() async {
+    try {
+      await _auth.signOut();
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/login');
+    } catch (e) {
+      print('Erro ao fazer logout: $e');
+    }
   }
 
   Widget _buildLoadingState() {
@@ -135,9 +191,11 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildSummaryItem('Receitas', summary['income'] ?? 0, Colors.green),
-                _buildSummaryItem('Despesas', summary['expense'] ?? 0, Colors.red),
-                _buildSummaryItem('Saldo', summary['balance'] ?? 0, 
+                _buildSummaryItem(
+                    'Receitas', summary['income'] ?? 0, Colors.green),
+                _buildSummaryItem(
+                    'Despesas', summary['expense'] ?? 0, Colors.red),
+                _buildSummaryItem('Saldo', summary['balance'] ?? 0,
                     summary['balance']! >= 0 ? Colors.blue : Colors.orange),
               ],
             ),
@@ -169,7 +227,7 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
 
   Widget _buildCategoryChart(List<ChartData> data) {
     final total = data.fold(0.0, (sum, item) => sum + item.y);
-    
+
     return Card(
       elevation: 4,
       child: Padding(
@@ -182,10 +240,7 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            
-            if (data.isEmpty)
-              const Text('Nenhuma despesa registrada'),
-              
+            if (data.isEmpty) const Text('Nenhuma despesa registrada'),
             ...data.map((item) => _buildCategoryItem(item, total)),
           ],
         ),
@@ -196,7 +251,7 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
   Widget _buildCategoryItem(ChartData data, double total) {
     final percentage = total > 0 ? (data.y / total * 100) : 0;
     final color = _getCategoryColor(data.x);
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: Column(
@@ -247,9 +302,11 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
 
   Widget _buildBarChart(List<TransactionModel> transactions) {
     final monthlyData = _prepareMonthlyData(transactions);
-    final maxValue = monthlyData.fold(0.0, (max, item) => 
-      item.income > max ? item.income : (item.expense > max ? item.expense : max)
-    );
+    final maxValue = monthlyData.fold(
+        0.0,
+        (max, item) => item.income > max
+            ? item.income
+            : (item.expense > max ? item.expense : max));
 
     return Card(
       elevation: 4,
@@ -267,24 +324,24 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
               height: 200,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: monthlyData.map((data) => 
-                  _buildBarChartItem(data, maxValue)
-                ).toList(),
+                children: monthlyData
+                    .map((data) => _buildBarChartItem(data, maxValue))
+                    .toList(),
               ),
             ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: monthlyData.map((data) => 
-                SizedBox(
-                  width: 40,
-                  child: Text(
-                    data.month,
-                    style: TextStyle(fontSize: 10),
-                    textAlign: TextAlign.center,
-                  ),
-                )
-              ).toList(),
+              children: monthlyData
+                  .map((data) => SizedBox(
+                        width: 40,
+                        child: Text(
+                          data.month,
+                          style: TextStyle(fontSize: 10),
+                          textAlign: TextAlign.center,
+                        ),
+                      ))
+                  .toList(),
             ),
             const SizedBox(height: 16),
             _buildChartLegend(),
@@ -297,7 +354,7 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
   Widget _buildBarChartItem(MonthlyData data, double maxValue) {
     final incomeHeight = maxValue > 0 ? (data.income / maxValue * 120) : 0;
     final expenseHeight = maxValue > 0 ? (data.expense / maxValue * 120) : 0;
-    
+
     return Expanded(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -375,7 +432,7 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
 
   Widget _buildRecentTransactions(List<TransactionModel> transactions) {
     final recentTransactions = transactions.take(5).toList();
-    
+
     return Card(
       elevation: 4,
       child: Padding(
@@ -400,7 +457,6 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
               ],
             ),
             const SizedBox(height: 16),
-            
             if (recentTransactions.isEmpty)
               const Center(
                 child: Text(
@@ -408,10 +464,8 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
                   style: TextStyle(color: Colors.grey),
                 ),
               ),
-              
-            ...recentTransactions.map((transaction) => 
-              _buildTransactionItem(transaction)
-            ),
+            ...recentTransactions
+                .map((transaction) => _buildTransactionItem(transaction)),
           ],
         ),
       ),
@@ -432,14 +486,14 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: transaction.type == 'income' 
-                  ? Colors.green.withOpacity(0.1) 
+              color: transaction.type == 'income'
+                  ? Colors.green.withOpacity(0.1)
                   : Colors.red.withOpacity(0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Icon(
-              transaction.type == 'income' 
-                  ? Icons.arrow_upward 
+              transaction.type == 'income'
+                  ? Icons.arrow_upward
                   : Icons.arrow_downward,
               color: transaction.type == 'income' ? Colors.green : Colors.red,
               size: 20,
@@ -475,7 +529,8 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
                 'R\$${transaction.amount.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: transaction.type == 'income' ? Colors.green : Colors.red,
+                  color:
+                      transaction.type == 'income' ? Colors.green : Colors.red,
                   fontSize: 14,
                 ),
               ),
@@ -504,21 +559,22 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
       Colors.pink,
       Colors.indigo,
     ];
-    
+
     final index = category.hashCode % colors.length;
     return colors[index];
   }
 
-  Map<String, List<ChartData>> _prepareChartData(List<TransactionModel> transactions) {
+  Map<String, List<ChartData>> _prepareChartData(
+      List<TransactionModel> transactions) {
     final expenseByCategory = <String, double>{};
-    
+
     for (final transaction in transactions) {
       if (transaction.type == 'expense') {
-        expenseByCategory[transaction.category] = 
+        expenseByCategory[transaction.category] =
             (expenseByCategory[transaction.category] ?? 0) + transaction.amount;
       }
     }
-    
+
     final expenseData = expenseByCategory.entries
         .map((entry) => ChartData(entry.key, entry.value))
         .toList();
@@ -529,7 +585,7 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
   Map<String, double> _calculateSummary(List<TransactionModel> transactions) {
     double income = 0;
     double expense = 0;
-    
+
     for (final transaction in transactions) {
       if (transaction.type == 'income') {
         income += transaction.amount;
@@ -537,7 +593,7 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
         expense += transaction.amount;
       }
     }
-    
+
     return {
       'income': income,
       'expense': expense,
@@ -548,16 +604,17 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
   List<MonthlyData> _prepareMonthlyData(List<TransactionModel> transactions) {
     final now = DateTime.now();
     final monthlyData = <MonthlyData>[];
-    
+
     for (int i = 5; i >= 0; i--) {
       final month = DateTime(now.year, now.month - i);
       final monthKey = DateFormat('MMM').format(month);
-      
+
       double monthlyIncome = 0;
       double monthlyExpense = 0;
-      
+
       for (final transaction in transactions) {
-        if (transaction.date.year == month.year && transaction.date.month == month.month) {
+        if (transaction.date.year == month.year &&
+            transaction.date.month == month.month) {
           if (transaction.type == 'income') {
             monthlyIncome += transaction.amount;
           } else {
@@ -565,10 +622,10 @@ class _InicioScreenState extends State<InicioScreen> with SingleTickerProviderSt
           }
         }
       }
-      
+
       monthlyData.add(MonthlyData(monthKey, monthlyIncome, monthlyExpense));
     }
-    
+
     return monthlyData;
   }
 }

@@ -90,10 +90,6 @@ class _TransacoesScreenState extends State<TransacoesScreen> {
     });
   }
 
-  void _navigateToAddTransaction() {
-    Navigator.pushNamed(context, '/add-transaction');
-  }
-
   void _editTransaction(TransactionModel transaction) {
     Navigator.pushNamed(
       context, 
@@ -210,7 +206,7 @@ class _TransacoesScreenState extends State<TransacoesScreen> {
                   itemCount: transactions.length + (_hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == transactions.length) {
-                      return _buildLoadingMore();
+                      return const SizedBox(height: 16);
                     }
                     
                     final transaction = transactions[index];
@@ -225,11 +221,7 @@ class _TransacoesScreenState extends State<TransacoesScreen> {
             ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _navigateToAddTransaction,
-        child: const Icon(Icons.add),
-      ),
+      )
     );
   }
 
@@ -259,15 +251,6 @@ class _TransacoesScreenState extends State<TransacoesScreen> {
             ),
           ],
         ],
-      ),
-    );
-  }
-
-  Widget _buildLoadingMore() {
-    return const Padding(
-      padding: EdgeInsets.all(16),
-      child: Center(
-        child: CircularProgressIndicator(),
       ),
     );
   }
