@@ -16,6 +16,7 @@ class _RegisterScrennState extends State<RegisterScrenn> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
 
   String _errorMessage = '';
 
@@ -24,6 +25,7 @@ class _RegisterScrennState extends State<RegisterScrenn> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        backgroundColor: AppColors.background,
         title: const Text('Cadastrar usuário'),
       ),
       body: Padding(
@@ -49,6 +51,16 @@ class _RegisterScrennState extends State<RegisterScrenn> {
               ),
               obscureText: true,
             ),
+            TextField(
+              controller: _confirmPasswordController,
+              decoration: const InputDecoration(
+                labelText: 'Confirmar a senha',
+                prefixIcon: Icon(
+                  Icons.lock
+                )
+              ),
+              obscureText: true,
+            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               _errorMessage,
@@ -67,6 +79,13 @@ class _RegisterScrennState extends State<RegisterScrenn> {
 
   _registrar() async{
     try {
+      bool ehValido = _validarCampos();
+
+      if (!ehValido) {
+        setState(() {});
+        return;
+      }
+
       await _auth.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
@@ -78,5 +97,21 @@ class _RegisterScrennState extends State<RegisterScrenn> {
         _errorMessage = e.message!;
       });
     }
+  }
+
+  bool _validarCampos() {
+    if (_emailController.text.isEmpty) {
+      _errorMessage = 'Por favor, preencha email.';
+      return false;
+    }
+    if (_passwordController.text.isEmpty || _confirmPasswordController.text.isEmpty) {
+      _errorMessage = 'Por favor, preencha senha e a confirmação da senha.';
+      return false;
+    }
+    if (_passwordController.text != _confirmPasswordController.text) {
+      _errorMessage = 'Por favor, a senha deve ser igual a confirmação da senha.';
+      return false;
+    }
+    return true;
   }
 }

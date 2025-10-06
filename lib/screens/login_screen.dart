@@ -84,6 +84,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
   _entrar() async {
     try {
+      bool ehValido = _validarCampos();
+
+      if (!ehValido) {
+        setState(() {});
+        return;
+      }
+
       await _auth.signInWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
@@ -95,5 +102,17 @@ class _LoginScreenState extends State<LoginScreen> {
         _errorMessage = e.message!;
       });
     }
+  }
+
+  bool _validarCampos() {
+    if (_emailController.text.isEmpty) {
+      _errorMessage = 'Por favor, preencha email.';
+      return false;
+    }
+    if (_passwordController.text.isEmpty) {
+      _errorMessage = 'Por favor, preencha senha.';
+      return false;
+    }
+    return true;
   }
 }
