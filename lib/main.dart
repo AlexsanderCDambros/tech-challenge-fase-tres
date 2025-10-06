@@ -1,11 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:tech_challenge_fase_tres/login_screen.dart';
-import 'package:tech_challenge_fase_tres/register_screen.dart';
 
-import 'inicio.dart';
 import 'routes.dart';
-import 'transacoes.dart';
+import 'screens/login_screen.dart';
+import 'screens/register_screen.dart';
+import 'screens/inicio_screen.dart';
+import 'screens/transacoes_screen.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +25,8 @@ class MyApp extends StatelessWidget {
       routes: {
         Routes.login: (context) => LoginScreen(),
         Routes.registro: (context) => RegisterScrenn(),
-        Routes.inicio: (context) => InicioPage(),
-        Routes.transacoes: (context) => TransacoesPage(),
+        Routes.inicio: (context) => InicioScreen(),
+        Routes.transacoes: (context) => TransacoesScreen(),
       }
     );
   }

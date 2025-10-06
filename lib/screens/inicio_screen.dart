@@ -1,14 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class InicioPage extends StatefulWidget {
-  const InicioPage({super.key});
+class InicioScreen extends StatefulWidget {
+  const InicioScreen({super.key});
 
   @override
-  State<InicioPage> createState() => _InicioPageState();
+  State<InicioScreen> createState() => _InicioScreenState();
 }
 
-class _InicioPageState extends State<InicioPage> {
+class _InicioScreenState extends State<InicioScreen> {
  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override

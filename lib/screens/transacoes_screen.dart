@@ -1,14 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class TransacoesPage extends StatefulWidget {
-  const TransacoesPage({super.key});
+class TransacoesScreen extends StatefulWidget {
+  const TransacoesScreen({super.key});
 
   @override
-  State<TransacoesPage> createState() => _TransacoesPageState();
+  State<TransacoesScreen> createState() => _TransacoesScreenState();
 }
 
-class _TransacoesPageState extends State<TransacoesPage> {
+class _TransacoesScreenState extends State<TransacoesScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override

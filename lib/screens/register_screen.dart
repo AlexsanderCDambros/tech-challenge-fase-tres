@@ -2,6 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tech_challenge_fase_tres/routes.dart';
 
+import '../app_colors.dart';
+import '../app_spacing.dart';
+
 class RegisterScrenn extends StatefulWidget {
   const RegisterScrenn({super.key});
 
@@ -19,28 +22,39 @@ class _RegisterScrennState extends State<RegisterScrenn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('Cadastrar usuário'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           children: [
             TextField(
               controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                prefixIcon: Icon(
+                  Icons.email
+                )
+              ),
             ),
             TextField(
               controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Senha'),
+              decoration: const InputDecoration(
+                labelText: 'Senha',
+                prefixIcon: Icon(
+                  Icons.lock
+                )
+              ),
               obscureText: true,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.md),
             Text(
               _errorMessage,
-              style: const TextStyle(color: Colors.red),
+              style: const TextStyle(color: AppColors.error),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppSpacing.md),
             ElevatedButton(
               onPressed: _registrar,
               child: const Text('Registrar'),
